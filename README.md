@@ -52,17 +52,19 @@ coffee-journal/
 
 ## 📋 功能特色
 
-### 🔐 使用者認證
-- JWT Token 認證機制
-- 安全的密碼雜湊
-- Token 刷新和驗證
+### 🔐 認證架構
+- **Laravel**: 負責使用者註冊、登入、會話管理
+- **JWT Token**: Laravel 簽發 JWT，Java 後端驗證
+- **無狀態認證**: 前端使用 JWT 調用 Java API
+- **Token 管理**: 自動刷新和驗證機制
 
-### 📝 咖啡筆記管理
+### 📝 咖啡筆記管理（Java 後端）
 - **創建筆記**: 記錄咖啡豆資訊、烘焙程度、風味描述等
 - **編輯筆記**: 修改現有筆記內容
 - **刪除筆記**: 移除不需要的筆記
 - **搜尋功能**: 根據關鍵字搜尋筆記
 - **分頁瀏覽**: 支援大量筆記的分頁顯示
+- **使用者隔離**: 每個使用者只能存取自己的筆記
 
 ### 📊 統計分析
 - 筆記總數統計
@@ -158,11 +160,18 @@ JAVA_API_URL=http://localhost:8080
 
 ## 📡 API 文檔
 
-### 認證端點
-- `POST /api/auth/login` - 使用者登入
-- `POST /api/auth/refresh` - 刷新 Token
+### Laravel 認證端點
+- `POST /login` - 使用者登入（Breeze）
+- `POST /register` - 使用者註冊（Breeze）
+- `POST /logout` - 使用者登出（Breeze）
+- `GET /api/user` - 獲取當前使用者資訊
+- `POST /api/jwt/token` - 生成 JWT Token
+- `POST /api/jwt/verify` - 驗證 JWT Token
+- `POST /api/jwt/refresh` - 刷新 JWT Token
+
+### Java 後端認證端點
+- `POST /api/auth/login` - 使用者登入（測試用）
 - `GET /api/auth/validate` - 驗證 Token
-- `POST /api/auth/logout` - 使用者登出
 
 ### 筆記管理端點
 - `GET /api/notes` - 獲取筆記列表（支援分頁）
