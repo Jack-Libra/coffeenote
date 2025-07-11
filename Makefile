@@ -144,7 +144,11 @@ test-java:
 ## 執行 Laravel 測試
 test-laravel:
 	@echo "$(YELLOW)🎨 執行 Laravel 測試...$(RESET)"
-	cd backend-laravel && php artisan test
+	@if [ -d "backend-laravel/tests" ]; then \
+		cd backend-laravel && php artisan test; \
+	else \
+		echo "$(BLUE)ℹ️  Laravel 測試目錄不存在，跳過測試$(RESET)"; \
+	fi
 
 ## 整合測試
 test-integration:

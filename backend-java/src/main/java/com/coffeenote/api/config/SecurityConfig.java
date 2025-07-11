@@ -41,18 +41,16 @@ import java.util.Arrays;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-    
     /**
      * 配置 HTTP 安全策略
-     * 
+     *
      * @param http HttpSecurity 物件
+     * @param jwtAuthenticationFilter JWT 認證過濾器
      * @return SecurityFilterChain
      * @throws Exception 配置異常
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
             // 禁用 CSRF，因為使用 JWT Token
             .csrf(csrf -> csrf.disable())

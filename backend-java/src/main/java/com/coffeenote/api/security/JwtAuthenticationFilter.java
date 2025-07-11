@@ -8,8 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -33,9 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     @Autowired
     private JwtUtil jwtUtil;
-    
-    @Autowired
-    private UserDetailsService userDetailsService;
     
     /**
      * 執行過濾邏輯
@@ -72,33 +68,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // 如果提取到使用者名稱且當前沒有認證上下文
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            
+
             try {
-                // 載入使用者詳細資訊
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-                
                 // 驗證 Token 是否有效
-                if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
-                    
-                    // 創建認證 Token
-                    UsernamePasswordAuthenticationToken authToken = 
+                if (jwtUtil.validateToken(jwt)) {
+
+                    // 獲取使用者 ID
+                    Long userId = jwtUtil.getUserIdFromToken(jwt);
+
+                    // 創建認證 Token（不需要載入使用者詳細資訊）
+                    UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                            userDetails, 
-                            null, 
-                            userDetails.getAuthorities()
+                            username,
+                            null,
+                            new ArrayList<>() // 空的權限列表
                         );
-                    
+
                     // 設定認證詳細資訊
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    
+
                     // 設定 Spring Security 認證上下文
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    
+
                     // 將使用者 ID 添加到請求屬性中，方便控制器使用
-                    Long userId = jwtUtil.getUserIdFromToken(jwt);
                     request.setAttribute("userId", userId);
                 }
-                
+
             } catch (Exception e) {
                 // 認證失敗，記錄錯誤但不中斷請求處理
                 logger.warn("JWT 認證失敗: " + e.getMessage());
