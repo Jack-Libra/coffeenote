@@ -2,6 +2,15 @@
 
 一個現代化的咖啡筆記管理系統，採用微服務架構設計，讓咖啡愛好者能夠記錄和管理他們的咖啡品嚐體驗。
 
+## 🎯 專案概覽
+
+Coffee Journal 是一個分離式架構的 Web 應用程式，將前端認證與後端資料處理完全分離：
+
+- **前端服務**: Laravel + Vue.js + Inertia.js
+- **後端服務**: Spring Boot + PostgreSQL
+- **認證機制**: JWT Token 跨服務認證
+- **部署方式**: Docker 容器化部署
+
 ## 🏗️ 專案架構
 
 ```
@@ -72,59 +81,51 @@ coffee-journal/
 - 評分分佈分析
 - 最近筆記查看
 
-## 🛠️ 快速開始
+## 🚀 快速開始
 
 ### 前置需求
-- Docker 和 Docker Compose（生產部署）
-- Java 17+ (本地開發)
-- Node.js 18+ (本地開發)
-- PHP 8.2+ (本地開發)
+- Docker 和 Docker Compose（推薦）
+- Make（可選，用於簡化指令）
 
-### 🚀 一鍵部署（推薦）
-
+### 一鍵部署
 ```bash
 # 克隆專案
 git clone <repository-url>
 cd coffee-journal
 
-# 使用 Docker 部署
+# 使用 Make 指令（推薦）
+make up
+
+# 或使用傳統方式
 ./deploy.sh
 ```
 
-### 🛠️ 開發環境
-
+### 常用指令
 ```bash
-# 啟動開發環境（自動啟動所有服務）
-./dev-start.sh
-```
+# 查看所有可用指令
+make help
 
-### 手動啟動
+# 啟動服務
+make up
 
-#### 使用 Docker
-```bash
-cd docker
-docker-compose up -d
-```
+# 查看服務狀態
+make status
 
-#### 本地開發
-```bash
-# 啟動 Java 後端
-cd backend-java
-./gradlew bootRun
+# 查看日誌
+make logs
 
-# 啟動 Laravel 前端（新終端）
-cd backend-laravel
-composer install
-npm install
-npm run dev
-php artisan serve
+# 停止服務
+make down
+
+# 執行測試
+make test
 ```
 
 ### 訪問應用
-- 前端應用: http://localhost:8000
-- Java API: http://localhost:8080
-- API 健康檢查: http://localhost:8080/api/health
-- H2 控制台: http://localhost:8080/h2-console
+- **前端應用**: http://localhost:8000
+- **Java API**: http://localhost:8080
+- **API 文檔**: http://localhost:8080/swagger-ui.html
+- **健康檢查**: http://localhost:8080/api/health
 
 ## 🔧 配置說明
 
@@ -226,6 +227,30 @@ php artisan test
    ```bash
    docker-compose -f docker-compose.prod.yml up -d
    ```
+
+## 🤝 貢獻指南
+
+1. Fork 專案
+2. 創建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交變更 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 開啟 Pull Request
+
+## 📄 授權
+
+本專案採用 MIT 授權 - 詳見 [LICENSE](LICENSE) 文件
+
+## 👥 開發團隊
+
+- **Coffee Journal Team** - 初始開發
+
+## 📚 詳細文檔
+
+- **[Laravel 前端文檔](backend-laravel/README.md)** - 前端架構和開發指南
+- **[Java 後端文檔](backend-java/README.md)** - 後端 API 和服務說明
+- **[架構設計文檔](backend-laravel/docs/architecture.md)** - 系統架構詳細說明
+- **[JWT 認證流程](backend-java/docs/jwt-flow.md)** - 認證機制技術細節
+- **[Vue 頁面說明](backend-laravel/resources/js/Pages/README.md)** - 前端頁面組件文檔
 
 ## 🤝 貢獻指南
 

@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: coffeenote
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     ports:
       - "5432:5432"
     volumes:
@@ -17,6 +18,11 @@ services:
     networks:
       - coffeenote-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Java Spring Boot 後端
   backend-java:
@@ -30,10 +36,13 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres123
       JWT_SECRET: mySecretKey12345678901234567890123456789012345678901234567890
+      JWT_EXPIRATION: 86400000
+      CORS_ALLOWED_ORIGINS: http://localhost:8000,http://backend-laravel:8000
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - coffeenote-network
     restart: unless-stopped
@@ -42,6 +51,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
   # Laravel + Vue 前端
   backend-laravel:
@@ -52,6 +62,7 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: false
+      APP_KEY: base64:your-app-key-here
       APP_URL: http://localhost:8000
       DB_CONNECTION: pgsql
       DB_HOST: postgres
@@ -59,19 +70,40 @@ services:
       DB_DATABASE: coffeenote
       DB_USERNAME: postgres
       DB_PASSWORD: postgres123
+      JWT_SECRET: mySecretKey12345678901234567890123456789012345678901234567890
       JAVA_API_URL: http://backend-java:8080
+      SESSION_DRIVER: database
+      CACHE_DRIVER: database
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
-      - backend-java
+      postgres:
+        condition: service_healthy
+      backend-java:
+        condition: service_healthy
     networks:
       - coffeenote-network
     restart: unless-stopped
     volumes:
       - laravel_storage:/var/www/html/storage
+      - laravel_cache:/var/www/html/bootstrap/cache
 
-  # Nginx 反向代理（可選）
+  # Redis (可選，用於快取和會話)
+  redis:
+    image: redis:7-alpine
+    container_name: coffeenote-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - coffeenote-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Nginx 反向代理
   nginx:
     image: nginx:alpine
     container_name: coffeenote-nginx
@@ -79,8 +111,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
     depends_on:
       - backend-laravel
       - backend-java
@@ -93,7 +126,12 @@ volumes:
     driver: local
   laravel_storage:
     driver: local
+  laravel_cache:
+    driver: local
 
 networks:
   coffeenote-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
