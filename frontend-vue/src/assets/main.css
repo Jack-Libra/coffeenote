@@ -1,38 +1,222 @@
 @import './base.css';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+/* Coffee Journal 自訂樣式 */
+
+/* 根元素主題變數 */
+:root {
+  --transition-theme: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-light: 0 4px 20px rgba(111, 78, 55, 0.15);
+  --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --gradient-light: linear-gradient(135deg, #ffc87fff 0%, #ffd7afe6 50%, #fefaf6 100%);
+  --gradient-dark: linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%);
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+/* 平滑滾動 */
+html {
+  scroll-behavior: smooth;
+  transition: var(--transition-theme);
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+/* 主體背景漸變 */
+body {
+  background: var(--gradient-light);
+  transition: var(--transition-theme);
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.dark body {
+  background: var(--gradient-dark);
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+/* 自訂滾動條 */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom, #ffc87fff, #ffd7afe6);
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom, #1f2937, #374151);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #6f4e37, #3e2723);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #3e2723, #2c1810);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #ffd7afe6, #ffc87fff);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #ffc87fff, #ffb366);
+}
+
+/* 全域樣式增強 */
+* {
+  box-sizing: border-box;
+  transition: var(--transition-theme);
+}
+
+/* 主題切換動畫 */
+.theme-transition {
+  transition: var(--transition-theme);
+}
+
+/* 焦點樣式 */
+:focus {
+  outline: 3px solid #6f4e37;
+  outline-offset: 3px;
+  outline-style: dashed;
+  transition: outline 0.2s ease;
+}
+
+.dark :focus {
+  outline-color: #ffd7afe6;
+  outline-style: solid;
+}
+
+/* 選擇文字樣式 */
+::selection {
+  background: linear-gradient(135deg, #ffc87fff, #ffd7afe6);
+  color: #95756f;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dark ::selection {
+  background: linear-gradient(135deg, #6f4e37, #3e2723);
+  color: #ffd7afe6;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+/* 卡片陰影增強 */
+.card-shadow {
+  box-shadow: var(--shadow-light);
+  transition: var(--transition-theme);
+}
+
+.dark .card-shadow {
+  box-shadow: var(--shadow-dark);
+}
+
+.card-shadow:hover {
+  box-shadow: 0 8px 30px rgba(111, 78, 55, 0.25);
+  transform: translateY(-4px);
+}
+
+.dark .card-shadow:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* 按鈕增強樣式 */
+.btn-enhanced {
+  background: linear-gradient(135deg, #6f4e37 0%, #3e2723 100%);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: var(--transition-theme);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-enhanced:hover::before {
+  left: 100%;
+}
+
+.btn-enhanced:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(111, 78, 55, 0.4);
+}
+
+.dark .btn-enhanced {
+  background: linear-gradient(135deg, #ffd7afe6 0%, #ffc87fff 100%);
+  color: #3e2723;
+}
+
+.dark .btn-enhanced:hover {
+  box-shadow: 0 8px 25px rgba(255, 215, 175, 0.4);
+}
+
+/* 文字漸變效果 */
+.text-gradient {
+  background: linear-gradient(135deg, #6f4e37, #3e2723);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.dark .text-gradient {
+  background: linear-gradient(135deg, #ffd7afe6, #ffc87fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 邊框漸變 */
+.border-gradient {
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #6f4e37, #3e2723) border-box;
+}
+
+.dark .border-gradient {
+  background: linear-gradient(#1f2937, #1f2937) padding-box,
+              linear-gradient(135deg, #ffd7afe6, #ffc87fff) border-box;
+}
+
+/* 玻璃效果 */
+.glass-effect {
+  background: rgba(255, 200, 127, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 200, 127, 0.2);
+  box-shadow: 0 8px 32px rgba(111, 78, 55, 0.1);
+}
+
+.dark .glass-effect {
+  background: rgba(255, 215, 175, 0.05);
+  border: 1px solid rgba(255, 215, 175, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* 脈動動畫 */
+@keyframes pulse-light {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(111, 78, 55, 0.4); }
+  50% { box-shadow: 0 0 0 20px rgba(111, 78, 55, 0); }
+}
+
+@keyframes pulse-dark {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 175, 0.4); }
+  50% { box-shadow: 0 0 0 20px rgba(255, 215, 175, 0); }
+}
+
+.pulse-animation {
+  animation: pulse-light 2s infinite;
+}
+
+.dark .pulse-animation {
+  animation: pulse-dark 2s infinite;
 }

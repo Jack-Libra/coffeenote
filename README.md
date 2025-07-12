@@ -261,29 +261,12 @@ php artisan test
    docker-compose -f docker-compose.prod.yml up -d
    ```
 
-## 🤝 貢獻指南
-
-1. Fork 專案
-2. 創建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交變更 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 開啟 Pull Request
-
-## 📄 授權
-
-本專案採用 MIT 授權 - 詳見 [LICENSE](LICENSE) 文件
-
-## 👥 開發團隊
-
-- **Coffee Journal Team** - 初始開發
-
 ## 📚 詳細文檔
 
-- **[Laravel 前端文檔](backend-laravel/README.md)** - 前端架構和開發指南
-- **[Java 後端文檔](backend-java/README.md)** - 後端 API 和服務說明
-- **[架構設計文檔](backend-laravel/docs/architecture.md)** - 系統架構詳細說明
-- **[JWT 認證流程](backend-java/docs/jwt-flow.md)** - 認證機制技術細節
-- **[Vue 頁面說明](backend-laravel/resources/js/Pages/README.md)** - 前端頁面組件文檔
+- **[Vue 前端文檔](frontend-vue/README.md)** - Vue.js 前端架構和開發指南
+- **[Laravel 認證文檔](backend-laravel/README.md)** - Laravel 認證服務說明
+- **[Java 後端文檔](backend-java/README.md)** - Spring Boot API 服務說明
+- **[Vue 風格指南](frontend-vue/STYLEGUIDE.md)** - 前端設計系統和樣式規範
 
 ## 🤝 貢獻指南
 
