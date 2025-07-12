@@ -1,6 +1,6 @@
 package com.coffeenote.api.config;
 
-import com.coffeenote.api.security.JwtAuthenticationFilter;
+import com.coffeenote.api.filter.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

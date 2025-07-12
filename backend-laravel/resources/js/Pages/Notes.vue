@@ -27,7 +27,7 @@ const getJwtToken = async () => {
   if (token) {
     // 驗證 token 是否仍然有效
     try {
-      const verifyRes = await fetch('/api/jwt/verify', {
+      const verifyRes = await fetch('/jwt/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ const getJwtToken = async () => {
 
   // 生成新的 JWT token
   try {
-    const tokenRes = await fetch('/api/jwt/token', {
+    const tokenRes = await fetch('/jwt/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,6 +63,8 @@ const getJwtToken = async () => {
       token = data.token
       localStorage.setItem('jwt_token', token)
       return token
+    } else {
+      console.error('JWT token 生成失敗:', tokenRes.status, tokenRes.statusText)
     }
   } catch (e) {
     console.error('JWT token 生成失敗:', e)

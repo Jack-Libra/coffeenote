@@ -80,8 +80,8 @@ public class Note {
     /**
      * 使用者 ID
      * 關聯到建立此筆記的使用者
+     * 注意：此字段由Controller自動設置，不需要客戶端驗證
      */
-    @NotNull(message = "使用者 ID 不能為空")
     @Column(name = "user_id", nullable = false)
     private Long userId;
     

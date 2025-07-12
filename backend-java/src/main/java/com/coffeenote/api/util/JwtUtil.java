@@ -61,13 +61,29 @@ public class JwtUtil {
     
     /**
      * 從 Token 中提取使用者 ID
-     * 
+     *
      * @param token JWT Token
      * @return 使用者 ID
      */
     public Long getUserIdFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
-        return claims.get("userId", Long.class);
+        // 首先嘗試從 userId 字段獲取（Java 後端生成的 token）
+        Long userId = claims.get("userId", Long.class);
+        if (userId != null) {
+            return userId;
+        }
+
+        // 如果沒有 userId 字段，則從 subject 字段獲取（Laravel 生成的 token）
+        String subject = claims.getSubject();
+        if (subject != null) {
+            try {
+                return Long.parseLong(subject);
+            } catch (NumberFormatException e) {
+                throw new JwtException("無法從 JWT Token 中解析使用者 ID");
+            }
+        }
+
+        throw new JwtException("JWT Token 中缺少使用者 ID 資訊");
     }
     
     /**

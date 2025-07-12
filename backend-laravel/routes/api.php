@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\JwtController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,13 +13,14 @@ use App\Http\Controllers\JwtController;
 |
 */
 
-// JWT Token 相關 API（需要認證）
-Route::middleware('auth:sanctum')->group(function () {
-    // 獲取當前使用者資訊
-    Route::get('/user', [JwtController::class, 'getCurrentUser']);
-
-    // JWT Token 管理
-    Route::post('/jwt/token', [JwtController::class, 'generateToken']);
-    Route::post('/jwt/verify', [JwtController::class, 'verifyToken']);
-    Route::post('/jwt/refresh', [JwtController::class, 'refreshToken']);
+// JWT 認證 API
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+], function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::get('user-profile', [AuthController::class, 'userProfile']);
 });

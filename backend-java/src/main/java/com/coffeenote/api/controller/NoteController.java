@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -35,9 +36,6 @@ public class NoteController {
     @Autowired
     private NoteService noteService;
     
-    @Autowired
-    private JwtUtil jwtUtil;
-    
     /**
      * 獲取當前使用者的所有筆記
      * 支援分頁和排序
@@ -55,11 +53,11 @@ public class NoteController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort,
-            @RequestHeader("Authorization") String authorization) {
-        
+            HttpServletRequest request) {
+
         try {
-            // 從 JWT Token 中提取使用者 ID
-            Long userId = getUserIdFromToken(authorization);
+            // 從請求屬性中獲取使用者 ID
+            Long userId = getUserIdFromRequest(request);
             
             // 解析排序參數
             String[] sortParams = sort.split(",");
@@ -91,10 +89,10 @@ public class NoteController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getNoteById(
             @PathVariable Long id,
-            @RequestHeader("Authorization") String authorization) {
-        
+            HttpServletRequest request) {
+
         try {
-            Long userId = getUserIdFromToken(authorization);
+            Long userId = getUserIdFromRequest(request);
             Note note = noteService.getNoteByIdAndUserId(id, userId);
             
             if (note != null) {
@@ -122,19 +120,19 @@ public class NoteController {
     @PostMapping
     public ResponseEntity<?> createNote(
             @Valid @RequestBody Note note,
-            @RequestHeader("Authorization") String authorization) {
-        
+            HttpServletRequest request) {
+
         try {
-            Long userId = getUserIdFromToken(authorization);
-            
+            Long userId = getUserIdFromRequest(request);
+
             // 設定筆記的使用者 ID
             note.setUserId(userId);
-            
+
             // 創建筆記
             Note createdNote = noteService.createNote(note);
-            
+
             return ResponseEntity.status(HttpStatus.CREATED).body(createdNote);
-            
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "認證失敗", "message", e.getMessage()));
@@ -156,10 +154,10 @@ public class NoteController {
     public ResponseEntity<?> updateNote(
             @PathVariable Long id,
             @Valid @RequestBody Note note,
-            @RequestHeader("Authorization") String authorization) {
-        
+            HttpServletRequest request) {
+
         try {
-            Long userId = getUserIdFromToken(authorization);
+            Long userId = getUserIdFromRequest(request);
             
             // 設定筆記 ID 和使用者 ID
             note.setId(id);
@@ -192,10 +190,10 @@ public class NoteController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNote(
             @PathVariable Long id,
-            @RequestHeader("Authorization") String authorization) {
-        
+            HttpServletRequest request) {
+
         try {
-            Long userId = getUserIdFromToken(authorization);
+            Long userId = getUserIdFromRequest(request);
             
             boolean deleted = noteService.deleteNoteByIdAndUserId(id, userId);
             
@@ -223,10 +221,10 @@ public class NoteController {
     @GetMapping("/search")
     public ResponseEntity<?> searchNotes(
             @RequestParam String keyword,
-            @RequestHeader("Authorization") String authorization) {
-        
+            HttpServletRequest request) {
+
         try {
-            Long userId = getUserIdFromToken(authorization);
+            Long userId = getUserIdFromRequest(request);
             List<Note> notes = noteService.searchNotes(userId, keyword);
             
             return ResponseEntity.ok(notes);
@@ -247,10 +245,10 @@ public class NoteController {
      */
     @GetMapping("/stats")
     public ResponseEntity<?> getNoteStats(
-            @RequestHeader("Authorization") String authorization) {
-        
+            HttpServletRequest request) {
+
         try {
-            Long userId = getUserIdFromToken(authorization);
+            Long userId = getUserIdFromRequest(request);
             Map<String, Object> stats = noteService.getNoteStats(userId);
             
             return ResponseEntity.ok(stats);
@@ -262,18 +260,20 @@ public class NoteController {
     }
     
     /**
-     * 從 JWT Token 中提取使用者 ID
-     * 
-     * @param authorization Authorization Header 的值
+     * 從請求屬性中獲取使用者 ID
+     *
+     * JWT 認證過濾器已經驗證了 token 並將 userId 設置到請求屬性中，
+     * 這裡直接從請求屬性中獲取，避免重複解析 JWT token
+     *
+     * @param request HTTP 請求對象
      * @return 使用者 ID
-     * @throws Exception 如果 Token 無效或過期
+     * @throws Exception 如果無法獲取使用者 ID
      */
-    private Long getUserIdFromToken(String authorization) throws Exception {
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            throw new Exception("無效的 Authorization Header");
+    private Long getUserIdFromRequest(HttpServletRequest request) throws Exception {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new Exception("無法獲取使用者 ID，請確保已正確認證");
         }
-        
-        String token = authorization.substring(7); // 移除 "Bearer " 前綴
-        return jwtUtil.getUserIdFromToken(token);
+        return userId;
     }
 }
