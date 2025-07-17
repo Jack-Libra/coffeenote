@@ -24,7 +24,7 @@ help:
 	@echo "$(YELLOW)️ 開發指令:$(RESET)"
 	@echo "  make dev         - 啟動完整開發環境"
 	@echo "  make dev-vue     - 僅啟動 Vue.js 前端 (端口 5173)"
-	@echo "  make dev-laravel - 僅啟動 Laravel 認證 (端口 8000)"
+	@echo "  make dev-laravel - 僅啟動 Laravel 認證 (端口 8001)"
 	@echo "  make dev-java    - 僅啟動 Java 後端 (端口 8080)"
 	@echo "  make install     - 安裝所有依賴"
 	@echo ""
@@ -101,14 +101,14 @@ dev:
 	@echo "$(GREEN)🚀 啟動完整開發環境...$(RESET)"
 	@echo "$(BLUE)🎨 啟動 Vue.js 前端 (端口 5173)...$(RESET)"
 	cd frontend-vue && npm run dev &
-	@echo "$(BLUE)🔐 啟動 Laravel 認證 (端口 8000)...$(RESET)"
-	cd backend-laravel && php artisan serve --port=8000 &
+	@echo "$(BLUE)🔐 啟動 Laravel 認證 (端口 8001)...$(RESET)"
+	cd backend-laravel && php artisan serve --port=8001 &
 	@echo "$(BLUE)☕ 啟動 Java 後端 (端口 8080)...$(RESET)"
 	cd backend-java && ./gradlew bootRun &
 	@echo "$(GREEN)✅ 開發環境已啟動$(RESET)"
 	@echo "$(BLUE)📱 訪問地址:$(RESET)"
 	@echo "  Vue.js 前端: http://localhost:5173"
-	@echo "  Laravel 認證: http://localhost:8000"
+	@echo "  Laravel 認證: http://localhost:8001"
 	@echo "  Java API: http://localhost:8080"
 
 ## 僅啟動 Vue.js 前端
@@ -119,7 +119,7 @@ dev-vue:
 ## 僅啟動 Laravel 認證服務
 dev-laravel:
 	@echo "$(BLUE)🔐 啟動 Laravel 認證服務...$(RESET)"
-	cd backend-laravel && php artisan serve --port=8000
+	cd backend-laravel && php artisan serve --port=8001
 
 ## 僅啟動 Java 後端
 dev-java:

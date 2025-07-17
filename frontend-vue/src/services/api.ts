@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Laravel 後端 API 基礎 URL
-const LARAVEL_API_URL = 'http://localhost:8000/api'
+const LARAVEL_API_URL = 'http://localhost:8001/api'
 // Java 後端 API 基礎 URL  
 const JAVA_API_URL = 'http://localhost:8080/api'
 

@@ -1,229 +1,185 @@
-# 🎨 Laravel 前端服務
+# ☕ Coffee Journal - Laravel 認證服務
 
-Coffee Journal 的前端服務，負責使用者介面、認證管理和 JWT Token 簽發。
+Coffee Journal 的 Laravel 後端服務，專門負責使用者認證和 JWT Token 管理。
 
-## 🏗️ 技術架構
+## 🎯 服務職責
 
-### 核心技術棧
-- **Laravel 11**: PHP 後端框架
-- **Vue.js 3**: 前端 JavaScript 框架
-- **Inertia.js**: SPA 體驗的橋樑
-- **Tailwind CSS**: 實用優先的 CSS 框架
-- **Vite**: 現代化前端建構工具
-- **Laravel Breeze**: 認證腳手架
+Laravel 應用專注於：
 
-### 主要職責
-- 🔐 **使用者認證**: 註冊、登入、密碼重設
-- 🎫 **JWT 簽發**: 為 Java 後端提供認證 Token
-- 🖥️ **前端介面**: Vue.js 單頁應用
-- 📱 **響應式設計**: 支援各種設備尺寸
+- 🔐 **使用者認證** - 註冊、登入、登出
+- 🎫 **JWT Token 管理** - 簽發和驗證 JWT tokens  
+- 👤 **使用者管理** - 基本的使用者資料管理
+- 🔒 **安全性** - 密碼加密、CORS 設定
 
-## 📁 目錄結構
+## 🏗️ 精簡架構
 
+### 核心依賴 (已優化)
+- **Laravel 11** - PHP Web 框架
+- **JWT Authentication** - `php-open-source-saver/jwt-auth`
+- **SQLite** - 輕量級資料庫
+
+
+### 結構
 ```
-backend-laravel/
-├── app/
-│   ├── Http/Controllers/
-│   │   ├── Auth/           # Breeze 認證控制器
-│   │   ├── JwtController.php # JWT Token 管理
-│   │   └── ProfileController.php
-│   └── Models/
-│       └── User.php        # 使用者模型
-├── resources/
-│   ├── js/
-│   │   ├── Components/     # Vue 組件
-│   │   ├── Layouts/        # 頁面佈局
-│   │   ├── Pages/          # 頁面組件
-│   │   │   ├── Auth/       # 認證相關頁面
-│   │   │   ├── Dashboard.vue
-│   │   │   ├── Notes.vue   # 咖啡筆記頁面
-│   │   │   └── Welcome.vue
-│   │   └── app.js          # 主要 JS 入口
-│   ├── css/
-│   │   └── app.css         # 主要樣式文件
-│   └── views/
-│       └── app.blade.php   # 主要 Blade 模板
-├── routes/
-│   ├── web.php             # Web 路由
-│   ├── api.php             # API 路由（JWT 相關）
-│   └── auth.php            # 認證路由
-├── database/
-│   └── migrations/         # 資料庫遷移
-├── config/
-│   ├── cors.php            # CORS 配置
-│   └── sanctum.php         # Sanctum 配置
-└── docs/                   # 文檔目錄
-    └── architecture.md     # 架構文檔
+app/
+├── Http/Controllers/
+│   ├── AuthController.php           # JWT 認證控制器
+│   └── Auth/                        # 基礎認證控制器
+├── Models/
+│   └── User.php                     # 使用者模型
+└── Providers/
+    └── AppServiceProvider.php       # 服務提供者
+
+config/
+├── auth.php                         # 認證配置
+├── cors.php                         # CORS 配置  
+├── database.php                     # 資料庫配置
+└── jwt.php                          # JWT 配置
+
+routes/
+├── api.php                          # API 路由
+├── auth.php                         # 認證路由 (精簡版)
+└── web.php                          # 基本健康檢查
 ```
 
-## 🚀 開發環境設置
+## 🚀 快速開始
 
-### 前置需求
+### 環境需求
 - PHP 8.2+
 - Composer
-- Node.js 18+
-- npm 或 yarn
 
 ### 安裝步驟
 
-1. **安裝 PHP 依賴**
+1. **安裝依賴**
    ```bash
-   composer install
+   composer install --no-dev
    ```
 
-2. **安裝前端依賴**
-   ```bash
-   npm install
-   ```
-
-3. **環境配置**
+2. **環境配置**
    ```bash
    cp .env.example .env
    php artisan key:generate
+   php artisan jwt:secret
    ```
 
-4. **資料庫設置**
+3. **資料庫設定**
    ```bash
+   touch database/database.sqlite
    php artisan migrate
    ```
 
-5. **啟動開發服務器**
+4. **啟動服務**
    ```bash
-   # 後端服務器
-   php artisan serve
-
-   # 前端開發服務器（新終端）
-   npm run dev
+   php artisan serve --host=0.0.0.0 --port=8000
    ```
-
-## 🔧 重要配置
-
-### JWT 配置 (.env)
-```env
-# JWT 密鑰（必須與 Java 後端一致）
-JWT_SECRET=mySecretKey12345678901234567890123456789012345678901234567890
-
-# Java 後端 API 地址
-JAVA_API_URL=http://localhost:8080
-
-# Sanctum 配置
-SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1,127.0.0.1:8000
-```
-
-### CORS 配置
-```php
-// config/cors.php
-'allowed_origins' => ['http://localhost:8080'],
-'allowed_methods' => ['*'],
-'allowed_headers' => ['*'],
-```
-
-## 🔐 認證流程
-
-### 1. 使用者註冊/登入
-- 使用 Laravel Breeze 提供的認證功能
-- 支援 email 驗證和密碼重設
-
-### 2. JWT Token 生成
-```javascript
-// 前端自動獲取 JWT Token
-const token = await fetch('/api/jwt/token', {
-  method: 'POST',
-  headers: {
-    'X-CSRF-TOKEN': csrfToken,
-    'Content-Type': 'application/json'
-  }
-})
-```
-
-### 3. 調用 Java API
-```javascript
-// 使用 JWT Token 調用 Java 後端
-const response = await fetch('http://localhost:8080/api/notes', {
-  headers: {
-    'Authorization': `Bearer ${jwtToken}`,
-    'Content-Type': 'application/json'
-  }
-})
-```
 
 ## 📡 API 端點
 
-### JWT 管理 API
-- `POST /api/jwt/token` - 生成 JWT Token
-- `POST /api/jwt/verify` - 驗證 JWT Token
-- `POST /api/jwt/refresh` - 刷新 JWT Token
-- `GET /api/user` - 獲取當前使用者資訊
-
-### 認證路由（Breeze）
-- `GET /login` - 登入頁面
-- `POST /login` - 處理登入
-- `GET /register` - 註冊頁面
-- `POST /register` - 處理註冊
-- `POST /logout` - 登出
-
-## 🧪 測試
-
-### 執行測試
-```bash
-# 執行所有測試
-php artisan test
-
-# 執行特定測試
-php artisan test --filter=JwtControllerTest
+### 認證相關
+```http
+POST /api/auth/register    # 使用者註冊
+POST /api/auth/login       # 使用者登入
+POST /api/auth/logout      # 使用者登出
+POST /api/auth/refresh     # 刷新 JWT token
+GET  /api/auth/me          # 獲取當前使用者資訊
 ```
 
-### 前端測試
-```bash
-# 執行 JavaScript 測試
-npm run test
-
-# 執行 E2E 測試
-npm run test:e2e
+### 健康檢查
+```http
+GET  /                     # 服務狀態檢查
 ```
 
-## 🔧 開發指令
+## 🔧 精簡配置
 
-```bash
-# 清除快取
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
+### JWT 配置
+- **Token 有效期**: 60 分鐘
+- **刷新期限**: 20160 分鐘 (14 天)
+- **演算法**: HS256
 
-# 查看路由
-php artisan route:list
+### CORS 設定
+- 允許來源: Vue 前端 (localhost:5173, localhost:5174)
+- 允許方法: GET, POST, PUT, DELETE, OPTIONS
+- 允許標頭: Authorization, Content-Type, Accept
 
-# 資料庫操作
-php artisan migrate
-php artisan migrate:rollback
-php artisan db:seed
+## 🔄 系統整合
 
-# 前端建構
-npm run build        # 生產建構
-npm run dev          # 開發模式
-npm run watch        # 監聽模式
-```
-
-## 🐛 常見問題
-
-### CSRF Token 錯誤
-確保在 AJAX 請求中包含 CSRF token：
+### 與 Vue 前端整合 (port 5174)
 ```javascript
-headers: {
-  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+// 登入獲取 JWT token
+const response = await axios.post('http://localhost:8000/api/auth/login', {
+  email: 'user@example.com',
+  password: 'password'
+})
+const token = response.data.access_token
+```
+
+### 與 Java 後端整合 (port 8080)
+- Laravel 簽發 JWT tokens
+- Java 後端驗證 Laravel 的 JWT tokens
+- 實現跨服務的使用者認證
+
+## 🧪 快速測試
+
+### 健康檢查
+```bash
+curl http://localhost:8000/
+```
+
+### 認證測試
+```bash
+# 註冊
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test","email":"test@example.com","password":"password","password_confirmation":"password"}'
+
+# 登入
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password"}'
+```
+
+## 📦 依賴管理
+
+### 生產依賴
+```json
+{
+  "php": "^8.2",
+  "laravel/framework": "^11.31",
+  "laravel/tinker": "^2.9",
+  "php-open-source-saver/jwt-auth": "^2.8"
 }
 ```
 
-### CORS 錯誤
-檢查 `config/cors.php` 配置，確保允許 Java 後端的域名。
+### 開發依賴 
+```json
+{
+  "fakerphp/faker": "^1.23",
+  "laravel/pint": "^1.13",
+  "mockery/mockery": "^1.6",
+  "nunomaduro/collision": "^8.1"
+}
+```
 
-### JWT Token 無效
-確認 `.env` 中的 `JWT_SECRET` 與 Java 後端一致。
+## 🚨 故障排除
 
-## 📚 相關文檔
+### JWT Secret 未設定
+```bash
+php artisan jwt:secret
+```
 
-- [Vue.js 頁面說明](resources/js/Pages/README.md)
-- [架構設計文檔](docs/architecture.md)
-- [Laravel 官方文檔](https://laravel.com/docs)
-- [Inertia.js 文檔](https://inertiajs.com/)
-- [Vue.js 文檔](https://vuejs.org/)
+### 資料庫問題
+```bash
+touch database/database.sqlite
+php artisan migrate
+```
+
+### 清理快取
+```bash
+php artisan cache:clear
+php artisan config:clear
+```
+
+
+## 📄 授權
+
+本專案採用 MIT 授權
